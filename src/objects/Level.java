@@ -14,6 +14,8 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 public class Level {
+
+	
 	// Tile id constants (add more here)
 	public final int DIRT = 0;
 
@@ -87,6 +89,15 @@ public class Level {
 
 		populateImages();
 		populateMap(fileName, tileSize);
+		
+		int currentPosition;
+		g = img.createGraphics();
+		for (int r = 0; r < this.map.length; r++) {
+			for (int c = 0; c < this.map[r].length; c++) {
+				currentPosition = this.map[r][c];
+				drawTileImage(currentPosition, r, c, g);
+			}
+		}
 
 	}
 
@@ -199,15 +210,18 @@ public class Level {
 	 *            the pixel size of a tile. 32 is perferable.
 	 */
 	BufferedImage img;
+
 	public void populateMap(String fileName, int tileSize) {
 		try {
 			String parser = " ";
 			String currentLine = null;
 			String[] currentLineValues = null;
-//			FileReader fileInput = new FileReader(fileName);
-//			BufferedReader imageReader = new BufferedReader(new FileReader(fileInput));
+			// FileReader fileInput = new FileReader(fileName);
+			// BufferedReader imageReader = new BufferedReader(new
+			// FileReader(fileInput));
 			InputStream fileInput = getClass().getResourceAsStream(fileName);
-			BufferedReader imageReader = new BufferedReader(new InputStreamReader(fileInput));
+			BufferedReader imageReader = new BufferedReader(
+					new InputStreamReader(fileInput));
 			this.mapWidth = Integer.parseInt(imageReader.readLine());
 			this.mapHeight = Integer.parseInt(imageReader.readLine());
 
@@ -227,7 +241,8 @@ public class Level {
 					this.map[c][r] = Integer.parseInt(currentLineValues[c]);
 				}
 			}
-			img = new BufferedImage(this.mapWidth*this.tileSize,this.mapHeight*this.tileSize,BufferedImage.TYPE_INT_RGB);
+			img = new BufferedImage(this.mapWidth * this.tileSize,
+					this.mapHeight * this.tileSize, BufferedImage.TYPE_INT_RGB);
 			imageReader.close();
 			generateBarrierCollisionBoxes();
 			generateRegularCollisionBoxes();
@@ -321,6 +336,8 @@ public class Level {
 		return this.goldObjects;
 	}
 
+	
+	private Graphics2D g;
 	/**
 	 * Assigns the proper images to the tiles.
 	 * 
@@ -328,17 +345,12 @@ public class Level {
 	 *            the Graphics2D of where the object is painted.
 	 */
 	public void draw(Graphics2D g2) {
-		int currentPosition;
-		// cache the tile background in an image so tiles don't need to be drawn again and again redundantly.
-		Graphics2D g = img.createGraphics();
-		for (int r = 0; r < this.map.length; r++) {
-			for (int c = 0; c < this.map[r].length; c++) {
-				currentPosition = this.map[r][c];
-				drawTileImage(currentPosition, r, c, g);
-			}
-		}
-		g.dispose();
+		
+		// cache the tile background in an image so tiles don't need to be drawn
+		// again and again redundantly.
+		
 		// draw cached tiles
+		
 		g2.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
 	}
 
@@ -357,7 +369,8 @@ public class Level {
 	 *            the Graphics2D object to draw on.
 	 */
 	public void drawTileImage(int tileValue, int row, int col, Graphics2D g2) {
-		// FIXME: reduce the number of calls to the code below. When does drawImage really need to be called?
+		// FIXME: reduce the number of calls to the code below. When does
+		// drawImage really need to be called?
 		BufferedImage image = this.images.get(tileValue);
 		g2.drawImage(image, row * this.tileSize, col * this.tileSize, null);
 	}
@@ -384,6 +397,7 @@ public class Level {
 	 */
 	public void updateTile(int x, int y, int tileID) {
 		this.map[x][y] = tileID;
+		drawTileImage(tileID, x, y, g);
 	}
 
 	/**
